@@ -1,0 +1,60 @@
+---
+title: "application_analysis"
+output: html_document
+date: "2023-01-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Using the 2021 salary guide data to analyze for any patterns or anomalies.
+
+```{r}
+install.packages("tidyverse")
+install.packages("janitor")
+install.packages("ggthemes")
+```
+```{r}
+library(tidyverse)
+library(janitor)
+library(ggthemes)
+```
+#Loading data and cleaning
+```{r}
+salary_data <- read_csv("salary_data.csv") %>% 
+  as.data.frame() %>% 
+  clean_names()
+
+```
+#Top salaries
+```{r}
+top_salaries <- salary_data %>% 
+  as.data.frame() %>% 
+  clean_names() %>% 
+  select(division, category_status, appt_base_annual_salary) %>% 
+  slice_max(appt_base_annual_salary, n=10)
+top_salaries
+```
+#Based on this analysis, the top 10 highest payed faculty are all tenured and they primarily are employed by the school of business or the behaviorial and social sciences departments.
+
+
+#Getting rid of scientific notation.
+```{r}
+options(scipen=999)
+```
+
+#Visualizing the analysis
+```{r}
+top_salaries %>% 
+  ggplot(aes(x = division, y=appt_base_annual_salary, fill=appt_base_annual_salary)) +
+  geom_bar(stat ="identity", position="dodge") +
+  theme(legend.position = "none") +
+  coord_flip() +
+  scale_fill_viridis_c() +
+  labs(title = "Highest Paid Professors by Department",
+       subtitle = "DBK Data on UMD Professors 2021",
+       caption = "Graphic by Parker Leipzig",
+       y="Salary",
+       x="University Departments")
+```
